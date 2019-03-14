@@ -59,7 +59,7 @@ def compute_bleu(reference_corpus, translation_corpus, max_order=4,
       smooth: Whether or not to apply Lin et al. 2004 smoothing.
 
     Returns:
-      3-Tuple with the BLEU score, n-gram precisions and brevity penalty.
+      4-Tuple with the BLEU score, geometric mean, n-gram precisions and brevity penalty.
     """
 
     # The use of & and | operators of Counter to implement
@@ -128,4 +128,4 @@ def compute_bleu(reference_corpus, translation_corpus, max_order=4,
 
     bleu = geo_mean * bp
 
-    return bleu, precisions, bp
+    return bleu, geo_mean, bp, precisions
