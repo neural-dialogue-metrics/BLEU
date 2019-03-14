@@ -29,13 +29,12 @@ def _get_ngrams(segment, max_order):
     """Extracts all n-grams upto a given maximum order from an input segment.
 
     Args:
-      segment: text segment from which n-grams will be extracted.
-      max_order: maximum length in tokens of the n-grams returned by this
-          methods.
+        segment: text segment from which n-grams will be extracted.
+        max_order: maximum length in tokens of the n-grams returned by this methods.
 
     Returns:
-      The Counter containing all n-grams upto max_order in segment
-      with a count of how many times each n-gram occurred.
+        The Counter containing all n-grams upto max_order in segment
+        with a count of how many times each n-gram occurred.
     """
     ngram_counts = collections.Counter()
     for order in range(1, max_order + 1):
@@ -51,15 +50,16 @@ def compute_bleu(reference_corpus, translation_corpus, max_order=4,
     """Computes BLEU score of translated segments against one or more references.
 
     Args:
-      reference_corpus: list of lists of references for each translation. Each
-          reference should be tokenized into a list of tokens.
-      translation_corpus: list of translations to score. Each translation
-          should be tokenized into a list of tokens.
-      max_order: Maximum n-gram order to use when computing BLEU score.
-      smooth: Whether or not to apply Lin et al. 2004 smoothing.
+        reference_corpus: list of lists of references for each translation. Each
+            reference should be tokenized into a list of tokens.
+            Note: This is a nested list of references. Each translation can have one or more references.
+        translation_corpus: list of translations to score. Each translation
+            should be tokenized into a list of tokens.
+        max_order: Maximum n-gram order to use when computing BLEU score.
+        smooth: Whether or not to apply Lin et al. 2004 smoothing.
 
     Returns:
-      4-Tuple with the BLEU score, geometric mean, n-gram precisions and brevity penalty.
+        4-Tuple with the BLEU score, geometric mean, n-gram precisions and brevity penalty.
     """
 
     # The use of & and | operators of Counter to implement
@@ -77,29 +77,32 @@ def compute_bleu(reference_corpus, translation_corpus, max_order=4,
 
         merged_ref_ngram_counts = collections.Counter()
         for reference in references:
-            # The | operator compute the maximum reference count as in the original paper.
-            # In fact, for any instance of n-grams, we takes its max count. For example,
-            # ref1 is "the", ref2 is "the the", we are using n=1 (unigram), then the merged count
-            # for "the" will be 2.
+            # The | operator computes the maximum reference count as in the original paper.
+            # In fact, for any instance of n-grams, we takes its max count among all references.
+            # For example, ref1 is "the", ref2 is "the the", we are using n=1 (unigram),
+            # then the max reference count for "the" will be 2.
             merged_ref_ngram_counts |= _get_ngrams(reference, max_order)
         translation_ngram_counts = _get_ngrams(translation, max_order)
 
         # The & operator does the clipping as in the original paper.
         # It ensures that the counts in overlap does not exceed that in the merged counts.
+        # The clipping prevents meaningless translation consisting of many repeated words being overestimated, like
+        # "the the the..." against "the cat sat on the mat".
         overlap = translation_ngram_counts & merged_ref_ngram_counts
         for ngram in overlap:
             matches_by_order[len(ngram) - 1] += overlap[ngram]
 
         # Compute normalizer or dividend of the precisions.
-        # This compute the count in a translation for each n-grams, stored in possible_matches_by_order[i],
-        # denoted as count_i. This term serves as the normalizer or dividend of the modified-ngrams-precision.
+        # This computes the counts of all n-grams ranging from 1 to max_order in a translation,
+        # stored in `possible_matches_by_order[i]`.
+        # This term serves as the normalizer or dividend of the modified-ngrams-precision.
         # The for loop below defines a simple function, see test_ngram_count.py for its behaviours.
         for order in range(1, max_order + 1):
             possible_matches = len(translation) - order + 1
             if possible_matches > 0:
                 possible_matches_by_order[order - 1] += possible_matches
 
-    # Modified n-grams precision.
+    # Compute the modified n-grams precision.
     precisions = [0] * max_order
     for i in range(0, max_order):
         if smooth:
