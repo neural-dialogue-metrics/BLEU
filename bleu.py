@@ -24,6 +24,8 @@ evaluation metrics for machine translation. COLING 2004.
 import collections
 import math
 
+__all__ = ["compute_bleu"]
+
 
 def _get_ngrams(segment, max_order):
     """Extracts all n-grams upto a given maximum order from an input segment.
@@ -115,11 +117,15 @@ def compute_bleu(reference_corpus, translation_corpus, max_order=4,
             else:
                 precisions[i] = 0.0
 
-    if min(precisions) > 0:
-        p_log_sum = sum((1. / max_order) * math.log(p) for p in precisions)
-        geo_mean = math.exp(p_log_sum)
-    else:
-        geo_mean = 0
+    # todo: problems here
+    # if min(precisions) > 0:
+    #     p_log_sum = sum((1. / max_order) * math.log(p) for p in precisions)
+    #     geo_mean = math.exp(p_log_sum)
+    # else:
+    #     geo_mean = 0
+
+    p_log_sum = sum((1. / max_order) * math.log(p) for p in precisions if p > 0)
+    geo_mean = math.exp(p_log_sum)
 
     # Compute the brevity penalty or BP for short.
     ratio = float(translation_length) / reference_length
