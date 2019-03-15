@@ -49,6 +49,24 @@ def _read_references(ref_files, n_trans):
     return references
 
 
+# About the format of the reference corpus.
+# The current format we use for the reference corpus is multiple files where
+# each provides one reference for every translation, as opposed to the previous format,
+# where there is a single file containing chunks of references for each translation.
+# The rational for the current format is that:
+# 1. References in MT form a pool, which should be easily extended.
+# 2. The number of references for each translation should be equal to one another.
+# You extend or shrink the pool for all translations all together.
+# You never get 2 references for trains-1 and 3 for trans-2.
+# Making one set of references in one file facilitates the above rational.
+# If you got a directory of references, you can run:
+#
+#   python bleu_metrics.py trans refs_dir/*.txt
+#
+# You can also control which references to include by explicitly listing them as arguments:
+#
+#   python bleu_metrics.py trans ref1 ref2 ref3
+#
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("translations", help="a file storing the translations corpus, one translation per line.")
