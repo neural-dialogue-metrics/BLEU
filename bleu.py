@@ -67,6 +67,7 @@ def compute_bleu(reference_corpus, translation_corpus, max_order=4,
     # The use of & and | operators of Counter to implement
     # max_ref_count and clipped_by_max_ref_count, which underlies the modified n-grams count,
     # is a very smart idea.
+    assert len(reference_corpus) == len(translation_corpus), "len of translations and references should match!"
 
     matches_by_order = [0] * max_order
     possible_matches_by_order = [0] * max_order
@@ -88,8 +89,8 @@ def compute_bleu(reference_corpus, translation_corpus, max_order=4,
 
         # The & operator does the clipping as in the original paper.
         # It ensures that the counts in overlap does not exceed that in the merged counts.
-        # The clipping prevents meaningless translation consisting of many repeated words being overestimated, like
-        # "the the the..." against "the cat sat on the mat".
+        # The clipping prevents meaningless translation consisting of many repeated words being overestimated,
+        # like "the the the..." against "the cat sat on the mat".
         overlap = translation_ngram_counts & merged_ref_ngram_counts
         for ngram in overlap:
             matches_by_order[len(ngram) - 1] += overlap[ngram]
@@ -117,15 +118,12 @@ def compute_bleu(reference_corpus, translation_corpus, max_order=4,
             else:
                 precisions[i] = 0.0
 
-    # todo: problems here
-    # if min(precisions) > 0:
-    #     p_log_sum = sum((1. / max_order) * math.log(p) for p in precisions)
-    #     geo_mean = math.exp(p_log_sum)
-    # else:
-    #     geo_mean = 0
-
-    p_log_sum = sum((1. / max_order) * math.log(p) for p in precisions if p > 0)
-    geo_mean = math.exp(p_log_sum)
+    # Note the rough behaviour here. See README.md.
+    if min(precisions) > 0:
+        p_log_sum = sum((1. / max_order) * math.log(p) for p in precisions)
+        geo_mean = math.exp(p_log_sum)
+    else:
+        geo_mean = 0
 
     # Compute the brevity penalty or BP for short.
     ratio = float(translation_length) / reference_length
