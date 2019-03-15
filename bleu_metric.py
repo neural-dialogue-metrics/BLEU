@@ -51,6 +51,4 @@ if __name__ == '__main__':
         smooth=args.smooth,
     )
 
-    # bleu_score = nltk.translate.bleu_score.corpus_bleu(references, translations)
-
     print("BLEU: %f" % bleu_score)
