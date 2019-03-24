@@ -83,6 +83,9 @@ if __name__ == '__main__':
 
     references = _read_references(args.references, len(translations))
 
+    # Note, Note, Note!
+    # Use corpus level BLEU! Don't use sentence level and then average!
+    # Corpus level is what BLEU designed to do.
     bleu_score, _, _, _ = bleu.compute_bleu(
         reference_corpus=references,
         translation_corpus=translations,

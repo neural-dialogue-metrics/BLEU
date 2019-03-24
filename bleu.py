@@ -47,8 +47,7 @@ def _get_ngrams(segment, max_order):
     return ngram_counts
 
 
-def compute_bleu(reference_corpus, translation_corpus, max_order=4,
-                 smooth=False):
+def compute_bleu(reference_corpus, translation_corpus, max_order=4, smooth=False):
     """Computes BLEU score of translated segments against one or more references.
 
     Args:
