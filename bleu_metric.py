@@ -20,7 +20,10 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import argparse
-import bleu
+import bleu.metrics as bleu
+
+from bleu.utils import load_reference_corpus
+from bleu.utils import load_translation_corpus
 
 
 def _break_into_words(line):
@@ -78,19 +81,17 @@ if __name__ == '__main__':
     parser.add_argument("-n", "--ngrams", type=int, default=4, help="using n-grams up to this length.")
     args = parser.parse_args()
 
-    with open(args.translations, 'r') as f:
-        translations = [_break_into_words(line) for line in f.readlines()]
-
-    references = _read_references(args.references, len(translations))
+    translations = load_translation_corpus(args.translations)
+    references = load_reference_corpus(args.references)
 
     # Note, Note, Note!
     # Use corpus level BLEU! Don't use sentence level and then average!
     # Corpus level is what BLEU designed to do.
-    bleu_score, _, _, _ = bleu.compute_bleu(
-        reference_corpus=references,
+    score = bleu.compute_bleu(
         translation_corpus=translations,
+        reference_corpus=references,
         max_order=args.ngrams,
-        smooth=args.smooth,
+        smooth=args.smooth
     )
 
-    print("BLEU: %f" % bleu_score)
+    print("BLEU: %f" % score.bleu)

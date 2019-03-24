@@ -26,6 +26,9 @@ import math
 
 __all__ = ["compute_bleu"]
 
+# Hold the result of compute_bleu().
+BleuScore = collections.namedtuple('BleuScore', ['bleu', 'geo_mean', 'precisions', 'brevity_penalty'])
+
 
 def _get_ngrams(segment, max_order):
     """Extracts all n-grams upto a given maximum order from an input segment.
@@ -47,7 +50,7 @@ def _get_ngrams(segment, max_order):
     return ngram_counts
 
 
-def compute_bleu(reference_corpus, translation_corpus, max_order=4, smooth=False):
+def compute_bleu(translation_corpus, reference_corpus, max_order=4, smooth=False):
     """Computes BLEU score of translated segments against one or more references.
 
     Args:
@@ -134,4 +137,4 @@ def compute_bleu(reference_corpus, translation_corpus, max_order=4, smooth=False
 
     bleu = geo_mean * bp
 
-    return bleu, geo_mean, bp, precisions
+    return BleuScore(bleu=bleu, geo_mean=geo_mean, precisions=precisions, brevity_penalty=bp)

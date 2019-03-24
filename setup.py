@@ -1,8 +1,10 @@
 from setuptools import setup
 
+__version__ = '0.2.0'
+
 setup(
     name='BLEU',
-    version='0.1',
+    version=__version__,
     description='implementation of BLEU metrics for machine translation',
     url='https://github.com/neural-dialogue-metrics/BLEU.git',
     author='cgsdfc',
@@ -13,12 +15,20 @@ setup(
         'computational linguistics',
         'machine translation',
     ],
+    # py_modules=['bleu'],
+    packages=[
+        'bleu',
+        'bleu.tests',
+    ],
+    package_data={
+        'bleu.tests': ['data/*'],
+    },
     scripts=['bleu_metric.py'],
     classifiers=[
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: Apache-v2',
         'Programming Language :: Python :: 3',
-        'Topic :: Text Processing :: Linguistic'
+        'Topic :: Text Processing :: Linguistic',
     ],
     license='LICENCE.txt',
     long_description=open('README.md').read(),
