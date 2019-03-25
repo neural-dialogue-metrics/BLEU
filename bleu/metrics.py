@@ -24,7 +24,7 @@ evaluation metrics for machine translation. COLING 2004.
 import collections
 import math
 
-__all__ = ["compute_bleu"]
+__all__ = ["compute_bleu", "BleuScore"]
 
 # Hold the result of compute_bleu().
 BleuScore = collections.namedtuple('BleuScore', ['bleu', 'geo_mean', 'precisions', 'brevity_penalty'])
