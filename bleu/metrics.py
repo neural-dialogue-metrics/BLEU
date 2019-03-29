@@ -24,10 +24,17 @@ evaluation metrics for machine translation. COLING 2004.
 import collections
 import math
 
-__all__ = ["compute_bleu", "BleuScore"]
+__all__ = [
+    "compute_bleu",
+    "bleu_corpus_level",
+    "bleu_sentence_level",
+    "BleuScore",
+]
 
-# Hold the result of compute_bleu().
+# Hold the result of bleu_corpus_level().
 BleuScore = collections.namedtuple('BleuScore', ['bleu', 'geo_mean', 'precisions', 'brevity_penalty'])
+
+DEFAULT_MAX_ORDER = 4
 
 
 def _get_ngrams(segment, max_order):
@@ -50,7 +57,11 @@ def _get_ngrams(segment, max_order):
     return ngram_counts
 
 
-def compute_bleu(translation_corpus, reference_corpus, max_order=4, smooth=False):
+def bleu_sentence_level(translation_sentence, reference_corpus, max_order=None, smooth=False):
+    return bleu_corpus_level([translation_sentence], [reference_corpus], max_order, smooth)
+
+
+def bleu_corpus_level(translation_corpus, reference_corpus, max_order=None, smooth=False):
     """Computes BLEU score of translated segments against one or more references.
 
     Args:
@@ -71,6 +82,7 @@ def compute_bleu(translation_corpus, reference_corpus, max_order=4, smooth=False
     # is a very smart idea.
     assert len(reference_corpus) == len(translation_corpus), "len of translations and references should match!"
 
+    max_order = max_order or DEFAULT_MAX_ORDER
     matches_by_order = [0] * max_order
     possible_matches_by_order = [0] * max_order
     reference_length = 0
@@ -138,3 +150,7 @@ def compute_bleu(translation_corpus, reference_corpus, max_order=4, smooth=False
     bleu = geo_mean * bp
 
     return BleuScore(bleu=bleu, geo_mean=geo_mean, precisions=precisions, brevity_penalty=bp)
+
+
+# Compatible
+compute_bleu = bleu_corpus_level

@@ -7,7 +7,7 @@ class TestBleu(unittest.TestCase):
 
     def test_basic(self):
         scores = [
-            bleu.compute_bleu(trains, tests.reference_corpus).bleu
+            bleu.bleu_corpus_level(trains, tests.reference_corpus).bleu
             for trains in tests.translation_corpus
         ]
 
@@ -19,7 +19,7 @@ class TestBleu(unittest.TestCase):
             'matches unigram has only sentence this'.split()
         ]]
 
-        score = bleu.compute_bleu(translation_corpus, reference_corpus)
+        score = bleu.bleu_corpus_level(translation_corpus, reference_corpus)
         self.assertAlmostEqual(score.bleu, 0.0, msg='get 0 without smoothing')
-        score = bleu.compute_bleu(translation_corpus, reference_corpus, smooth=True)
+        score = bleu.bleu_corpus_level(translation_corpus, reference_corpus, smooth=True)
         self.assertGreater(score.bleu, 0.0, msg='after smoothing')

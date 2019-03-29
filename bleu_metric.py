@@ -20,7 +20,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import argparse
-import bleu.metrics as bleu
+import bleu
 
 from bleu.utils import load_reference_corpus
 from bleu.utils import load_translation_corpus
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     # Note, Note, Note!
     # Use corpus level BLEU! Don't use sentence level and then average!
     # Corpus level is what BLEU designed to do.
-    score = bleu.compute_bleu(
+    score = bleu.bleu_corpus_level(
         translation_corpus=translations,
         reference_corpus=references,
         max_order=args.ngrams,
