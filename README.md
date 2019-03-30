@@ -1,4 +1,87 @@
-# BLEU
+BLEU Implementation
+===================
+
+# User Guide
+This guide will get you started to use our BLEU metric.
+## Use-case 1: I have my data in files.
+Machine translation system output things to files. Your gold reference resides in files.
+It is thus a common case to run the evaluation based on files.
+If you just want to do evaluation and see the result, the command line tool will get you right.
+```bash
+# Put your translation corpus in trans.txt.
+# Put your reference corpus in another file, say ref.txt.
+# If you have multiple references, just put them in more files, like r1.txt, r2.txt...
+# Run this command, use -s to turn on smoothing:
+bleu_metric.py trans.txt ref.txt
+
+# The output will look like:
+BLEU: 0.023333
+```
+
+## Use-case 2: I have my data in files, but want to use it programmatically.
+You can load your data files with our helper functions:
+```python
+import bleu
+
+# Note: the builder functions return things in *corpus* format. 
+trans = bleu.load_translation_corpus('your_file')
+refs = bleu.load_reference_corpus(['file_1', 'file_2', 'file_3'])
+
+# Data is suitable for corpus level evaluation.
+score = bleu.bleu_corpus_level(trans, refs, max_order=2)
+
+```
+
+## Use-case 3: My data is generated programmatically.
+You can just pass your data to the metric functions. You need to ensure your data is in the
+right shape (either corpus or sentence) as expected by the functions.
+```python
+import bleu
+
+# If you have a translation and reference corpus:
+score = bleu.bleu_corpus_level(
+    translation_corpus=[
+        'sentence 1'.split(),
+        'sentence 2'.split(),
+    ],
+    reference_corpus=[
+        [
+            'reference 1 for sentence 1'.split(),
+            'reference 2 for sentence 1'.split(),
+        ],
+        [
+            'reference 1 for sentence 2'.split(),
+            'reference 2 for sentence 2'.split(),
+        ]
+    ]
+)
+
+print(score)
+
+# Or if you have a translation sentence:
+score = bleu.bleu_sentence_level(
+    translation_sentence='sentence 1'.split(),
+    reference_corpus=[
+        'reference 1 for sentence 1'.split(),
+        'reference 2 for sentence 1'.split(),
+    ]
+)
+
+```
+Note that every single sentence must be a list of strings.
+
+# Installation
+## Dependencies
+- Python >= 3.6.2
+
+## Install
+```bash
+git clone https://github.com/neural-dialogue-metrics/BLEU.git
+cd BLEU
+pip install -e .
+```
+
+# Introduction to BLEU
 BLEU is a classical evaluation metric for machine translation based on a modified n-grams precision.
 It has been adopted by many dialogue researchers so it remains a baseline metric in this field.
 When trying to understand a metric (not to analyse it), we mainly concern about these things:
@@ -56,10 +139,7 @@ which complements the paper by working through examples and using plain language
 Also the source code of this repository and hopefully its comments will come to your aid.
 
 
-# Dependencies
-- Python >= 3.6.2
-
-# Usage
+# Examples
 To run the metric over a translation corpus and a reference corpus, run the following command:
 ```bash
 $ python bleu_metric.py translation ref1 ref2 ...
@@ -81,10 +161,10 @@ References:
 To see the score for each candidate, you can run the following commands:
 
     cd testdata
-    python ../bleu_metric.py ./trains1.txt ./ref1.txt ./ref2.txt ./ref3.txt -s
+    python ../bleu_metric.py ./trans1.txt ./ref1.txt ./ref2.txt ./ref3.txt -s
     BLEU: 0.128021
     
-    python ../bleu_metric.py ./trains2.txt ./ref1.txt ./ref2.txt ./ref3.txt -s
+    python ../bleu_metric.py ./trans2.txt ./ref1.txt ./ref2.txt ./ref3.txt -s
     BLEU: 0.570435
   
 You will see that score for the `trans2.txt` is higher than that of `trans1.txt`, matching the result of the original paper.

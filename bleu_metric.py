@@ -60,7 +60,7 @@ def _read_references(ref_files, n_trans):
 # 1. References in MT form a pool, which should be easily extended.
 # 2. The number of references for each translation should be equal to one another.
 # You extend or shrink the pool for all translations all together.
-# You never get 2 references for trains-1 and 3 for trans-2.
+# You never get 2 references for trans-1 and 3 for trans-2.
 # Making one set of references in one file facilitates the above rational.
 # If you got a directory of references, you can run:
 #
