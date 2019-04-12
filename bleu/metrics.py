@@ -57,6 +57,31 @@ def _get_ngrams(segment, max_order):
     return ngram_counts
 
 
+def _get_rank(array):
+    """
+    >>> _get_rank([])
+    1
+    >>> _get_rank(1)
+    0
+    >>> _get_rank([[]])
+    2
+    >>> _get_rank([[[]]])
+    3
+    >>> _get_rank([1,2,3])
+    1
+
+    :param array:
+    :return:
+    """
+    rank = 0
+    while isinstance(array, (list, tuple)):
+        rank += 1
+        if not array:
+            break
+        array = array[0]
+    return rank
+
+
 def bleu_sentence_level(translation_sentence, reference_corpus, max_order=None, smooth=False):
     return bleu_corpus_level([translation_sentence], [reference_corpus], max_order, smooth)
 
@@ -80,7 +105,13 @@ def bleu_corpus_level(translation_corpus, reference_corpus, max_order=None, smoo
     # The use of & and | operators of Counter to implement
     # max_ref_count and clipped_by_max_ref_count, which underlies the modified n-grams count,
     # is a very smart idea.
-    assert len(reference_corpus) == len(translation_corpus), "len of translations and references should match!"
+
+    if len(translation_corpus) != len(reference_corpus):
+        raise ValueError("""
+        You passed a translation_corpus of len %d and a reference_corpus of len %d.
+        Their lens don't match.
+        Perhaps some of them is not a *corpus*?
+        """ % (len(translation_corpus), len(reference_corpus)))
 
     max_order = max_order or DEFAULT_MAX_ORDER
     matches_by_order = [0] * max_order
