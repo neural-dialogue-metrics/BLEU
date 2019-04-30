@@ -38,7 +38,7 @@ DEFAULT_MAX_ORDER = 4
 
 
 def _get_ngrams(segment, max_order):
-    """Extracts all n-grams upto a given maximum order from an input segment.
+    """Extracts all n-grams up to a given maximum order from an input segment.
 
     Args:
         segment: text segment from which n-grams will be extracted.
@@ -55,31 +55,6 @@ def _get_ngrams(segment, max_order):
             ngram = tuple(segment[i:i + order])
             ngram_counts[ngram] += 1
     return ngram_counts
-
-
-def _get_rank(array):
-    """
-    >>> _get_rank([])
-    1
-    >>> _get_rank(1)
-    0
-    >>> _get_rank([[]])
-    2
-    >>> _get_rank([[[]]])
-    3
-    >>> _get_rank([1,2,3])
-    1
-
-    :param array:
-    :return:
-    """
-    rank = 0
-    while isinstance(array, (list, tuple)):
-        rank += 1
-        if not array:
-            break
-        array = array[0]
-    return rank
 
 
 def bleu_sentence_level(translation_sentence, reference_corpus, max_order=None, smooth=False):

@@ -1,6 +1,6 @@
 from setuptools import setup
 
-__version__ = '0.2.4'
+__version__ = '0.2.5'
 
 setup(
     name='BLEU',
@@ -22,7 +22,7 @@ setup(
     package_data={
         'bleu.tests': ['data/*'],
     },
-    scripts=['bleu_metric.py'],
+    scripts=['bin/bleu_metric.py'],
     classifiers=[
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: Apache-v2',
