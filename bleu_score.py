@@ -14,10 +14,6 @@
 # ==============================================================================
 
 """Driver script to compute BLEU score."""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import argparse
 from pathlib import Path
@@ -86,11 +82,11 @@ def eval_metric(translations, references, n, type, output_dir):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-t', "-translations")
-    parser.add_argument('-r', "-references", nargs='+')
+    parser.add_argument('-t', dest="translations")
+    parser.add_argument('-r', dest="references", nargs='+')
     parser.add_argument("-n", "--n_grams", nargs='+', type=int)
     parser.add_argument('--type', choices=('bleu', 'geo_mean', 'precisions'), default='bleu')
-    parser.add_argument('--output_dir')
+    parser.add_argument('-p', dest='output_dir')
     args = parser.parse_args()
 
     translations = load_translation_corpus(args.translations)
