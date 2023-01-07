@@ -7,7 +7,7 @@ setup(
     version=__version__,
     description='implementation of BLEU metrics for machine translation',
     url='https://github.com/neural-dialogue-metrics/BLEU.git',
-    author='cgsdfc',
+    author='Cong Feng',
     author_email='cgsdfc@126.com',
     keywords=[
         'NL', 'CL', 'MT',

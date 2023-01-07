@@ -32,7 +32,9 @@ __all__ = [
 ]
 
 # Hold the result of bleu_corpus_level().
-BleuScore = collections.namedtuple('BleuScore', ['bleu', 'geo_mean', 'precisions', 'brevity_penalty'])
+BleuScore = collections.namedtuple(
+    "BleuScore", ["bleu", "geo_mean", "precisions", "brevity_penalty"]
+)
 
 DEFAULT_MAX_ORDER = 4
 
@@ -52,16 +54,22 @@ def _get_ngrams(segment, max_order):
     for order in range(1, max_order + 1):
         for i in range(0, len(segment) - order + 1):
             # For ngram to be hashable.
-            ngram = tuple(segment[i:i + order])
+            ngram = tuple(segment[i : i + order])
             ngram_counts[ngram] += 1
     return ngram_counts
 
 
-def bleu_sentence_level(translation_sentence, reference_corpus, max_order=None, smooth=False):
-    return bleu_corpus_level([translation_sentence], [reference_corpus], max_order, smooth)
+def bleu_sentence_level(
+    translation_sentence, reference_corpus, max_order=None, smooth=False
+):
+    return bleu_corpus_level(
+        [translation_sentence], [reference_corpus], max_order, smooth
+    )
 
 
-def bleu_corpus_level(translation_corpus, reference_corpus, max_order=None, smooth=False):
+def bleu_corpus_level(
+    translation_corpus, reference_corpus, max_order=None, smooth=False
+):
     """Computes BLEU score of translated segments against one or more references.
 
     Args:
@@ -82,19 +90,21 @@ def bleu_corpus_level(translation_corpus, reference_corpus, max_order=None, smoo
     # is a very smart idea.
 
     if len(translation_corpus) != len(reference_corpus):
-        raise ValueError("""
+        raise ValueError(
+            """
         You passed a translation_corpus of len %d and a reference_corpus of len %d.
         Their lens don't match.
         Perhaps some of them is not a *corpus*?
-        """ % (len(translation_corpus), len(reference_corpus)))
+        """
+            % (len(translation_corpus), len(reference_corpus))
+        )
 
     max_order = max_order or DEFAULT_MAX_ORDER
     matches_by_order = [0] * max_order
     possible_matches_by_order = [0] * max_order
     reference_length = 0
     translation_length = 0
-    for (references, translation) in zip(reference_corpus,
-                                         translation_corpus):
+    for (references, translation) in zip(reference_corpus, translation_corpus):
         reference_length += min(len(r) for r in references)
         translation_length += len(translation)
 
@@ -129,18 +139,20 @@ def bleu_corpus_level(translation_corpus, reference_corpus, max_order=None, smoo
     precisions = [0] * max_order
     for i in range(0, max_order):
         if smooth:
-            precisions[i] = ((matches_by_order[i] + 1.) /
-                             (possible_matches_by_order[i] + 1.))
+            precisions[i] = (matches_by_order[i] + 1.0) / (
+                possible_matches_by_order[i] + 1.0
+            )
         else:
             if possible_matches_by_order[i] > 0:
-                precisions[i] = (float(matches_by_order[i]) /
-                                 possible_matches_by_order[i])
+                precisions[i] = (
+                    float(matches_by_order[i]) / possible_matches_by_order[i]
+                )
             else:
                 precisions[i] = 0.0
 
     # Note the rough behaviour here. See README.md.
     if min(precisions) > 0:
-        p_log_sum = sum((1. / max_order) * math.log(p) for p in precisions)
+        p_log_sum = sum((1.0 / max_order) * math.log(p) for p in precisions)
         geo_mean = math.exp(p_log_sum)
     else:
         geo_mean = 0
@@ -149,13 +161,15 @@ def bleu_corpus_level(translation_corpus, reference_corpus, max_order=None, smoo
     ratio = float(translation_length) / reference_length
 
     if ratio > 1.0:
-        bp = 1.
+        bp = 1.0
     else:
-        bp = math.exp(1 - 1. / ratio)
+        bp = math.exp(1 - 1.0 / ratio)
 
     bleu = geo_mean * bp
 
-    return BleuScore(bleu=bleu, geo_mean=geo_mean, precisions=precisions, brevity_penalty=bp)
+    return BleuScore(
+        bleu=bleu, geo_mean=geo_mean, precisions=precisions, brevity_penalty=bp
+    )
 
 
 # Compatible
